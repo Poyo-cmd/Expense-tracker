@@ -31,11 +31,9 @@ def listar(
 
 @router.post("/", response_model=TransaccionResponse)
 def crear(datos: TransaccionCreate, db: Session = Depends(get_db), usuario=Depends(get_current_user)):
-    transaccion = Transaccion(
-        **datos.model_dump(),
-        usuario_id=usuario.id,
-        fecha=datos.fecha or datetime.utcnow()
-    )
+    datos_dict = datos.model_dump()
+    datos_dict['fecha'] = datos_dict.get('fecha') or datetime.utcnow()
+    transaccion = Transaccion(**datos_dict, usuario_id=usuario.id)
     db.add(transaccion)
     db.commit()
     db.refresh(transaccion)
